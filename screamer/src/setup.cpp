@@ -5,8 +5,8 @@
 
 extern clsScreamer screamer;
 
-const char* ssid = "Koprov 2.4_IoT";
-const char* password = "7323uewe";
+const char* ssid = "ssid";
+const char* password = "password";
 
 void setupDevice() {
     Serial.begin(115200);
