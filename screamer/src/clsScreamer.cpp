@@ -39,20 +39,21 @@ void clsScreamer::handleScreamer() {
 }
 
 void clsScreamer::reconnectMQTT() {
-    while (!client.connected()) {
-        String clientId = "ESP32Client-";
-        clientId += String(random(0xffff), HEX);
-        // Use the correct method to set the Will message during the connection attempt
-        if (client.connect(clientId.c_str(), NULL, NULL, status_topic, 0, true, "offline", true)) {  // Last parameter is for clean session
-            client.subscribe(command_topic);
+    if (!client.connected()) {
+        Serial.print("Attempting MQTT reconnection...");
+        // Fixed client ID as specified
+        if (client.connect("KoprovBoogiemanScreamer", NULL, NULL, status_topic, 1, true, "offline")) {
+            Serial.println("connected");
             client.publish(status_topic, "online", true);  // Report online status
+            client.subscribe(command_topic);
         } else {
-            Serial.println("MQTT connection failed. Attempting to reconnect...");
+            Serial.print("failed, rc=");
+            Serial.print(client.state());
+            Serial.println(" try again in 5 seconds");
             delay(5000);
         }
     }
 }
-
 
 void clsScreamer::mqttCallbackWrapper(char* topic, byte* message, unsigned int length) {
     if (instance) {
