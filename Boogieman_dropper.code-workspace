@@ -1,0 +1,16 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"name": "dropper",
+			"path": "dropper"
+		},
+		{
+			"name": "screamer",
+			"path": "screamer"
+		}
+	],
+	"settings": {}
+}
