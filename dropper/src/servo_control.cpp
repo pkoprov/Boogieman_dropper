@@ -21,13 +21,13 @@ void setupServos() {
 
 void lift() {
   servo1.writeMicroseconds(UP_USEC);
-  client.publish(manual_state_topic, "up", true);
+  client.publish(state_topic, "up", true);
   delay(1000);
 }
 
 void drop() {
   servo1.writeMicroseconds(DOWN_USEC);
-  client.publish(manual_state_topic, "down", true);
+  client.publish(state_topic, "down", true);
   delay(1000);
 }
 
@@ -35,7 +35,7 @@ void windUp(float inch) {
   float sec = inch / 2.1;
   int totalSeconds = floor(sec);
 
-  client.publish("koprov/boogieman/dropper/windUpStatus", "Start winding", true);
+  client.publish(windup_status, "Start winding", true);
   servo2.writeMicroseconds(2500); // Start continuous rotation for Servo 2
 
   for (int i = totalSeconds; i > 0; i--) {
@@ -46,13 +46,19 @@ void windUp(float inch) {
   }
 
   servo2.writeMicroseconds(1500); // Stop Servo 2 (neutral position)
-  client.publish("koprov/boogieman/dropper/windUpStatus", "Stopping winding", true);
+  client.publish(windup_status, "Stopping winding", true);
 }
 
 void enterAutoMode() {
-    client.publish(mode_topic, "auto", true); // Notify the broker that auto mode is active
-    windUp(42);  // Wind up initially
-    bmanUp = true;
+    // Notify the broker that auto mode is active
+    client.publish(mode_topic, "auto", true);
+
+    if (!bmanUp) {
+            // Only wind up if the boogieman is not already up
+            windUp(42);
+            bmanUp = true;
+        }
+
 
     bool objectDetected = false;
 
@@ -66,13 +72,13 @@ void enterAutoMode() {
 
         // Step 1: Detect object within 100 cm
         if (distance < DETECTION_THRESHOLD) {
-            client.publish("koprov/boogieman/dropper/auto/status", "Object detected within 100 cm", true);
+            client.publish(auto_distance, "Object detected within 100 cm", true);
             objectDetected = true;
         }
 
         // Step 2: Wait until object clears (distance > 100 cm)
         if (objectDetected && distance >= 100) {
-            client.publish("koprov/boogieman/dropper/auto/status", "Object cleared. Starting 3-second countdown...", true);
+            client.publish(auto_distance, "Object cleared. Starting 3-second countdown...", true);
 
             unsigned long clearTime = millis();
             bool objectStillAbsent = true;
@@ -83,7 +89,7 @@ void enterAutoMode() {
 
                 if (distance < DETECTION_THRESHOLD) {
                     objectStillAbsent = false;
-                    client.publish("koprov/boogieman/dropper/auto/status", "Object detected again during countdown. Canceling drop.", true);
+                    client.publish(auto_distance, "Object detected again during countdown. Canceling drop.", true);
                     break;
                 }
                 delay(200);  // Check every 200ms
@@ -91,7 +97,7 @@ void enterAutoMode() {
 
             // If the object is still absent after 3 seconds, drop the boogieman
             if (objectStillAbsent) {
-                client.publish("koprov/boogieman/dropper/auto/status", "Dropping Boogieman after 3-second countdown.", true);
+                client.publish(auto_distance, "Dropping Boogieman after 3-second countdown.", true);
                 drop();
                 bmanUp = false;
                 objectDetected = false;
@@ -115,7 +121,7 @@ void enterAutoMode() {
 
                 // If the area is clear for 10 seconds, lift and wind up the boogieman
                 if (!objectStillPresentAfterDrop) {
-                    client.publish("koprov/boogieman/dropper/auto/status", "Area clear. Lifting Boogieman.", true);
+                    client.publish(auto_distance, "Area clear. Lifting Boogieman.", true);
                     lift();
                     windUp(42);
                     bmanUp = true;
@@ -132,7 +138,7 @@ void enterManualMode() {
     client.publish(mode_topic, "manual", true);
     
     // Publish the initial state (up or down)
-    client.publish(manual_state_topic, bmanUp ? "up" : "down", true);
+    client.publish(state_topic, bmanUp ? "up" : "down", true);
 
     // Loop to remain in manual mode until switched to auto mode
     while (!autoMode) {

@@ -8,7 +8,7 @@ extern const char* mqtt_broker;
 extern const char* status_topic;
 extern const char* command_topic;
 extern const char* mode_topic;
-extern const char* manual_state_topic;
+extern const char* state_topic;
 extern const char* manual_command_topic;
 
 extern PubSubClient client;

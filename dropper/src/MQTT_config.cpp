@@ -5,8 +5,10 @@ const char* mqtt_broker = "broker.hivemq.com";
 const char* status_topic = "koprov/boogieman/dropper/status";
 const char* command_topic = "koprov/boogieman/dropper/CMD";
 const char* mode_topic = "koprov/boogieman/dropper/mode";
-const char* manual_state_topic = "koprov/boogieman/dropper/manual/state";
+const char* state_topic = "koprov/boogieman/dropper/manual/state";
 const char* manual_command_topic = "koprov/boogieman/dropper/CMD/manual";
+const char* auto_distance =  "koprov/boogieman/dropper/auto/distance";
+const char* windup_status = "koprov/boogieman/dropper/windUpStatus";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -34,6 +36,7 @@ void reconnectMQTT() {
       client.publish(status_topic, "online", true);
       client.subscribe(command_topic);
       client.subscribe(manual_command_topic);
+            client.subscribe(state_topic);
     } else {
       delay(5000);
     }
@@ -54,7 +57,6 @@ void handleMQTTCommands(char* topic, byte* payload, unsigned int length) {
     // Handle mode switching (auto/manual)
     if (String(topic) == command_topic) {
         if (message == "auto") {
-            client.publish(mode_topic, "auto", true);
             enterAutoMode();
         } else if (message == "manual") {
             enterManualMode();  // No need to publish inside handleMQTTCommands
@@ -66,10 +68,10 @@ void handleMQTTCommands(char* topic, byte* payload, unsigned int length) {
         if (message == "up") {
             lift();
             windUp(42);  // Example distance
-            client.publish(manual_state_topic, "up", true);
+            client.publish(state_topic, "up", true);
         } else if (message == "drop") {
             drop();
-            client.publish(manual_state_topic, "down", true);
+            client.publish(state_topic, "down", true);
         } else {
             client.publish("koprov/boogieman/dropper/errors", "Invalid command. Use 'up' or 'drop'", true);
         }
