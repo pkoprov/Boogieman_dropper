@@ -6,7 +6,7 @@ const char* status_topic = "koprov/boogieman/dropper/status";
 const char* command_topic = "koprov/boogieman/dropper/CMD";
 const char* mode_topic = "koprov/boogieman/dropper/mode";
 const char* manual_state_topic = "koprov/boogieman/dropper/manual/state";
-const char* manual_command_topic = "koprov/boogieman/dropper/manual/CMD";
+const char* manual_command_topic = "koprov/boogieman/dropper/CMD/manual";
 
 WiFiClient espClient;
 PubSubClient client(espClient);
