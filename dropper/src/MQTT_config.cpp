@@ -51,15 +51,18 @@ void handleMQTTCommands(char* topic, byte* payload, unsigned int length) {
     payload[length] = '\0'; // Ensure null-terminated string
     String message = String((char*)payload);
 
+    // Handle mode switching (auto/manual)
     if (String(topic) == command_topic) {
         if (message == "auto") {
             client.publish(mode_topic, "auto", true);
             enterAutoMode();
         } else if (message == "manual") {
-            client.publish(mode_topic, "manual", true);
-            enterManualMode();
+            enterManualMode();  // No need to publish inside handleMQTTCommands
         }
-    } else if (String(topic) == manual_command_topic) {
+    }
+
+    // Handle manual commands (up/down)
+    else if (String(topic) == manual_command_topic) {
         if (message == "up") {
             lift();
             windUp(42);  // Example distance
@@ -67,6 +70,8 @@ void handleMQTTCommands(char* topic, byte* payload, unsigned int length) {
         } else if (message == "drop") {
             drop();
             client.publish(manual_state_topic, "down", true);
+        } else {
+            client.publish("koprov/boogieman/dropper/errors", "Invalid command. Use 'up' or 'drop'", true);
         }
     }
 }

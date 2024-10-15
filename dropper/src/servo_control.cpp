@@ -128,30 +128,16 @@ void enterAutoMode() {
 
 
 void enterManualMode() {
-    client.publish(mode_topic, "manual", true); // Notify the broker that manual mode is active
-    client.publish(manual_state_topic, bmanUp ? "up" : "down", true);  // Publish the initial state (up or down)
+    // Publish to MQTT that manual mode is active
+    client.publish(mode_topic, "manual", true);
+    
+    // Publish the initial state (up or down)
+    client.publish(manual_state_topic, bmanUp ? "up" : "down", true);
 
-    while (!autoMode) {  // Manual mode loop until auto mode is triggered
-        // MQTT will receive commands via the `manual_command_topic` (koprov/boogieman/dropper/manual/CMD)
-        client.setCallback([](char* topic, byte* payload, unsigned int length) {
-            String input = String((char*)payload).substring(0, length);  // Parse the MQTT message
-            input.trim();  // Remove leading/trailing whitespace
-
-            if (input == "up" && !bmanUp) {
-                lift();
-                windUp(42);  // Wind up 42 inches
-                bmanUp = true;
-                client.publish(manual_state_topic, "up", true);
-            } else if (input == "drop") {
-                drop();
-                bmanUp = false;
-                client.publish(manual_state_topic, "down", true);
-            } else {
-                client.publish("koprov/boogieman/dropper/manual/error", "Invalid command. Use 'up' or 'drop'", true);
-            }
-        });
-
-        mqttLoop();  // Ensure MQTT messages are being processed
+    // Loop to remain in manual mode until switched to auto mode
+    while (!autoMode) {
+        // All the manual command handling (up/down) happens in handleMQTTCommands()
+        mqttLoop();  // Process incoming MQTT messages
         delay(100);  // Small delay to avoid excessive loop running
     }
 }
