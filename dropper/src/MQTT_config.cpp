@@ -66,6 +66,7 @@ void handleMQTTCommands(char* topic, byte* payload, unsigned int length) {
     // Handle manual commands (up/down)
     else if (String(topic) == manual_command_topic) {
         if (message == "up") {
+            stopScreamer();  // Stop the screamer right before winding up
             lift();
             windUp(42);  // Example distance
             client.publish(state_topic, "up", true);
@@ -76,4 +77,12 @@ void handleMQTTCommands(char* topic, byte* payload, unsigned int length) {
             client.publish("koprov/boogieman/dropper/errors", "Invalid command. Use 'up' or 'drop'", true);
         }
     }
+}
+
+void startScreamer() {
+    client.publish("koprov/boogieman/screamer/CMD", "1", true);  // Start the screamer
+}
+
+void stopScreamer() {
+    client.publish("koprov/boogieman/screamer/CMD", "0", true);  // Stop the screamer
 }

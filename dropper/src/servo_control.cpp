@@ -28,6 +28,7 @@ void lift() {
 void drop() {
   servo1.writeMicroseconds(DOWN_USEC);
   client.publish(state_topic, "down", true);
+  startScreamer();  // Start the screamer when the boogieman drops
   delay(1000);
 }
 
@@ -118,6 +119,7 @@ void enterAutoMode() {
 
                     delay(500);  // Delay between checks
                 }
+                stopScreamer();
 
                 // If the area is clear for 10 seconds, lift and wind up the boogieman
                 if (!objectStillPresentAfterDrop) {
