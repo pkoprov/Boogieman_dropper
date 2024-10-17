@@ -51,6 +51,14 @@ void windUp(float inch) {
   client.publish(windup_status, "Stopping winding", true);
   bmanUp = true;
 }
+
+void remainingTime(unsigned long clearTime, int preset) {
+    int remainingTime = (preset - (millis() - clearTime)) / 1000;
+    char message[50];  // Buffer to store the formatted string
+
+    // Format the string
+    sprintf(message, "restarting in %d sec", remainingTime);
+    client.publish(auto_distance, message, true);
 }
 
 void enterAutoMode() {
@@ -95,6 +103,7 @@ void enterAutoMode() {
                     client.publish(auto_distance, "Object detected again during countdown. Canceling drop.", true);
                     break;
                 }
+                remainingTime(clearTime, 3000);
                 delay(200);  // Check every 200ms
             }
 
@@ -106,19 +115,20 @@ void enterAutoMode() {
                 objectDetected = false;
 
                 // Step 4: Wait for the area to clear for 10 seconds before winding up again
-                unsigned long clearStart = millis();
+                clearTime = millis();
                 bool objectStillPresentAfterDrop = true;
 
-                while (millis() - clearStart < 10000) {
+                while (millis() - clearTime < 10000) {
                     distance = getSmoothedDistance(5);
 
                     if (distance < DETECTION_THRESHOLD) {
-                        clearStart = millis();  // Reset the timer
+                        clearTime = millis();  // Reset the timer
                         objectStillPresentAfterDrop = true;
                     } else {
                         objectStillPresentAfterDrop = false;
                     }
 
+                    remainingTime(clearTime, 10000);
                     delay(500);  // Delay between checks
                 }
                 stopScreamer();
