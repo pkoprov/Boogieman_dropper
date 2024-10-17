@@ -73,6 +73,9 @@ void handleMQTTCommands(char* topic, byte* payload, unsigned int length) {
         } else if (message == "drop") {
             drop();
             client.publish(state_topic, "down", true);
+        } else if (String(topic) == state_topic) {
+            if (message == "up") bmanUp = true;
+            else if (message == "down") bmanUp = false;
         } else {
             client.publish("koprov/boogieman/dropper/errors", "Invalid command. Use 'up' or 'drop'", true);
         }

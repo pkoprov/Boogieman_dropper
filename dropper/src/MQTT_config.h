@@ -4,6 +4,9 @@
 #include <PubSubClient.h>
 #include <WiFi.h>
 
+extern bool autoMode;
+extern bool bmanUp;
+
 extern const char* mqtt_broker;
 extern const char* status_topic;
 extern const char* command_topic;

@@ -30,6 +30,7 @@ void drop() {
   client.publish(state_topic, "down", true);
   startScreamer();  // Start the screamer when the boogieman drops
   delay(1000);
+  bmanUp = false;
 }
 
 void windUp(float inch) {
@@ -48,6 +49,8 @@ void windUp(float inch) {
 
   servo2.writeMicroseconds(1500); // Stop Servo 2 (neutral position)
   client.publish(windup_status, "Stopping winding", true);
+  bmanUp = true;
+}
 }
 
 void enterAutoMode() {
