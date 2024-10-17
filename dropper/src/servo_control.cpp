@@ -53,13 +53,11 @@ void windUp(float inch) {
 void enterAutoMode() {
     // Notify the broker that auto mode is active
     client.publish(mode_topic, "auto", true);
-
-    if (!bmanUp) {
-            // Only wind up if the boogieman is not already up
-            windUp(42);
+    drop();
+    stopScreamer();
+    lift();
+    windUp(20);
             bmanUp = true;
-        }
-
 
     bool objectDetected = false;
 
