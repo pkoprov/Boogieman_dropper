@@ -51,6 +51,7 @@ void windUp(float inch) {
 }
 
 void enterAutoMode() {
+    autoMode = true;
     // Notify the broker that auto mode is active
     client.publish(mode_topic, "auto", true);
     drop();
@@ -134,6 +135,7 @@ void enterAutoMode() {
 
 
 void enterManualMode() {
+    autoMode = false;
     // Publish to MQTT that manual mode is active
     client.publish(mode_topic, "manual", true);
     
@@ -147,3 +149,4 @@ void enterManualMode() {
         delay(100);  // Small delay to avoid excessive loop running
     }
 }
+

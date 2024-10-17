@@ -64,7 +64,7 @@ void handleMQTTCommands(char* topic, byte* payload, unsigned int length) {
     }
 
     // Handle manual commands (up/down)
-    else if (String(topic) == manual_command_topic) {
+    else if (String(topic) == manual_command_topic && !autoMode) {
         if (message == "up") {
             stopScreamer();  // Stop the screamer right before winding up
             lift();
