@@ -69,7 +69,7 @@ void enterAutoMode() {
     stopScreamer();
     lift();
     windUp(20);
-            bmanUp = true;
+    bmanUp = true;
 
     bool objectDetected = false;
 
@@ -79,7 +79,7 @@ void enterAutoMode() {
         // Publish distance to MQTT for monitoring
         char distanceStr[10];
         snprintf(distanceStr, sizeof(distanceStr), "%ld", distance);
-        client.publish("koprov/boogieman/dropper/auto/distance", distanceStr);
+        client.publish(auto_distance, distanceStr);
 
         // Step 1: Detect object within 100 cm
         if (distance < DETECTION_THRESHOLD) {
