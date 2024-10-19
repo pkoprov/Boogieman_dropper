@@ -1,8 +1,8 @@
 #include "ultrasonic_sensor.h"
 #include "MQTT_config.h" // Include MQTT configuration for publishing
 
-const int trigPin = 22;
-const int echoPin = 23;
+const int trigPin = 19;
+const int echoPin = 21;
 
 void setupSensor() {
   pinMode(trigPin, OUTPUT);

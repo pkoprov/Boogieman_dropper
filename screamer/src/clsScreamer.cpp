@@ -7,6 +7,7 @@ PubSubClient client(espClient);
 const char* mqtt_broker = "broker.hivemq.com";
 const char* command_topic = "koprov/boogieman/screamer/CMD";
 const char* status_topic = "koprov/boogieman/screamer/status";
+const char* state_topic = "koprov/boogieman/screamer/state";
 const int outputPin = 5;
 const int ledPin = 2;
 
@@ -62,6 +63,7 @@ void clsScreamer::mqttCallbackWrapper(char* topic, byte* message, unsigned int l
 }
 
 void clsScreamer::mqttCallback(char* topic, byte* message, unsigned int length) {
+    blinkLed();
     String messageTemp;
     for (int i = 0; i < length; i++) {
         messageTemp += (char)message[i];
@@ -69,18 +71,22 @@ void clsScreamer::mqttCallback(char* topic, byte* message, unsigned int length) 
 
     if (messageTemp == "1") {
         digitalWrite(outputPin, HIGH);
-        blinkLed();
+        digitalWrite(ledPin, HIGH);
+        client.publish(state_topic, "scream", true);
+        delay(100);
+        digitalWrite(ledPin, LOW);
     } else if (messageTemp == "0") {
         digitalWrite(outputPin, LOW);
         digitalWrite(ledPin, LOW);
+        client.publish(state_topic, "mute", true);
     }
 }
 
 void clsScreamer::blinkLed() {
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 2; i++) {
         digitalWrite(ledPin, HIGH);
-        delay(200);
+        delay(100);
         digitalWrite(ledPin, LOW);
-        delay(200);
+        delay(100);
     }
 }
