@@ -3,8 +3,8 @@
 #include "MQTT_config.h"
 
 Servo servo1, servo2;
-const int servo1Pin = 18;
-const int servo2Pin = 19;
+const int servo1Pin = 5;
+const int servo2Pin = 18;
 const int UP_USEC = 1550;
 const int DOWN_USEC = 500;
 bool bmanUp = false;
